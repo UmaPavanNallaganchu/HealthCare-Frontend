@@ -1,23 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import './CssFiles/App.css';
+import LoginandRegister from './components/SignInandSignUp';
+import DoctorDashBoard from './pages/DoctorDashBoard';
+import PatientDashBoard from './pages/PatientDashBoard';
+//import Home from './pages/Home';
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loginDetails, setLoginDetails] = useState(null);
+
+  useEffect(() => {
+    const userdata = localStorage.getItem('userLoggedIn');
+    if (userdata) {
+      setLoginDetails(JSON.parse(userdata));
+      console.log(userdata);
+      setLoggedIn(true);
+    }
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {loggedIn ? (
+        loginDetails && loginDetails.role === 'PATIENT' ? (
+          <PatientDashBoard />
+        ) : (
+          <DoctorDashBoard />
+        )
+      ) : (
+        <LoginandRegister setLoggedIn={setLoggedIn} />
+      )}
     </div>
   );
 }
