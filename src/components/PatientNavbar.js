@@ -3,10 +3,9 @@ import "../CssFiles/PatientNavbar.css";
 import {Link} from'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser ,faUserEdit, faSignOutAlt, faCalendarAlt, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
-function PatientNavBar(){
+function PatientNavBar({userdata,token}){
     const [popup, setPopup] = useState(false);
     const [userData, setUserData] = useState(null);
-    const userdata = JSON.parse(localStorage.getItem('userLoggedIn'));
     const handleLogout = () =>{
         localStorage.clear();
     }
@@ -16,7 +15,6 @@ function PatientNavBar(){
     
       const handleProfile = async (event) => {
         event.preventDefault();
-        const token = localStorage.getItem('jwtToken');
         const apiUrl = `http://localhost:8086/api/patient/${userdata.userId}`;
     
         try {
@@ -51,7 +49,7 @@ function PatientNavBar(){
                 <ul>
                 <li><Link to="/edit-profile"><FontAwesomeIcon icon={faUserEdit} /> &nbsp; Edit Profile</Link></li>
                 <li><Link to="/manage-bookings"><FontAwesomeIcon icon={faCalendarAlt} />  &nbsp; Manage Bookings</Link></li>
-                <li><Link to="/medical-history"><FontAwesomeIcon icon={faNotesMedical} />  &nbsp; Medical History</Link></li>
+                <li><Link to="/medicalHistory"><FontAwesomeIcon icon={faNotesMedical} />  &nbsp; Medical History</Link></li>
                 <li><a href="/" onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt} /> &nbsp; Logout</a></li>
                 </ul>
             </nav>

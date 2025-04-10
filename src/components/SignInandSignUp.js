@@ -12,7 +12,7 @@ const LoginandRegister = ({ setLoggedIn }) =>{
            <div className='switchingbuttons'><button name='SignIn'  className={clickbutton === 'SignIn' ? 'active' : 'inactive'} onClick={handlebuttonClick}>SignIn</button>
             <button name='SignUp' onClick={handlebuttonClick}  className={clickbutton === 'SignUp' ? 'active' : 'inactive'}>SignUp</button></div> 
             {clickbutton === 'SignIn' && <SignIn setLoggedIn={ setLoggedIn }/>}
-            {clickbutton === 'SignUp' && <SignUp/>}
+            {clickbutton === 'SignUp' && <SignUp back={setClickButton}/>}
     </div>);
 };
 export default LoginandRegister;

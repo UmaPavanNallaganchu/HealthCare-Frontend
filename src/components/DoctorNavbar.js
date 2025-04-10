@@ -4,10 +4,9 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserEdit, faSignOutAlt, faCalendarCheck, faHistory } from '@fortawesome/free-solid-svg-icons';
 
-function DoctorNavbar() {
+function DoctorNavbar({userdata,token}) {
   const [popup, setPopup] = useState(false);
   const [userData, setUserData] = useState(null);
-  const userdata = JSON.parse(localStorage.getItem('userLoggedIn'));
 
   const handleLogout = () => {
     localStorage.clear();
@@ -19,7 +18,6 @@ function DoctorNavbar() {
 
   const handleProfile = async (event) => {
     event.preventDefault();
-    const token = localStorage.getItem('jwtToken');
     const apiUrl = `http://localhost:8086/api/doctor/${userdata.userId}`;
 
     try {

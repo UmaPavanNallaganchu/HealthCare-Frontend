@@ -1,6 +1,6 @@
 .navbarcss {
-    height: 100vh; /* Full viewport height */
-    width: 250px; /* Fixed width for the sidebar */
+    height: 100%; /* Full viewport height */
+    width: 20%; /* Fixed width for the sidebar */
     background-color: #289C8E;
     display: flex;
     flex-direction: column;

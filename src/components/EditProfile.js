@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "../CssFiles/generalCss.css";
-const EditProfile = () => {
+const EditProfile = ({userdata,token}) => {
     const [userName, setUserName] = useState('');
     const [userEmailId, setUserEmailId] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -9,7 +9,6 @@ const EditProfile = () => {
     const [userId, setUserId] = useState('');
     const [gender, setGender] = useState('');
     const [specialization, setSpecialization] = useState('');
-    const userdata = JSON.parse(localStorage.getItem('userLoggedIn'));
     const [errors, setErrors] = useState({});
     const [popup, setPopup] = useState(false);
     const[existingPassword,setExistingPassword]=useState('');
@@ -18,7 +17,6 @@ const EditProfile = () => {
     useEffect(() => {
         console.log('Fetching user data...');
         const HandleGetData = async () => {
-            const token = localStorage.getItem('jwtToken');
             const apiUrl = (userdata.role === 'DOCTOR') ? 
                 `http://localhost:8086/api/doctor/${userdata.userId}` : 
                 `http://localhost:8086/api/patient/${userdata.userId}`;

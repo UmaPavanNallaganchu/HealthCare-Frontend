@@ -6,9 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faBell} from '@fortawesome/free-solid-svg-icons';
 import EditProfile from '../components/EditProfile';
 import Notifications from '../components/Notifications';
+import MedicalHistory from '../components/MedicalHisotry';
 function PatientDashBoard(){
     const [notificationTab, setNotificationTab] = useState(false);
-    
+    const userdata = JSON.parse(localStorage.getItem('userLoggedIn'));
+    const token = localStorage.getItem('jwtToken');
         const handleBellClick = () => {
             setNotificationTab(!notificationTab);
             console.log('Notification tab state:', !notificationTab);
@@ -17,16 +19,17 @@ function PatientDashBoard(){
         
         <Router>
         <div className='patientDashBoard'>
-            <div className='navbarforPatient'><PatientNavBar/></div>
+            <div className='navbarforPatient'><PatientNavBar userdata={userdata}/></div>
             <div className='dashBoardContent'>
                 <div className='topTab'>
                 <FontAwesomeIcon className="bell" icon={faBell} onClick={handleBellClick} />
-                {notificationTab && <Notifications tab={setNotificationTab}/>}
+                {notificationTab && <Notifications tab={setNotificationTab} userType={userdata.role} token={token}/>}
                 </div>
                 <div className='otherComponents'>
                 <Routes>
-                            <Route path="/edit-profile" element={<EditProfile/>} />
+                        <Route path="/edit-profile" element={<EditProfile userdata={userdata} token={token}/>} />
                             {/* Add more routes here as needed */}
+                        <Route path="/medicalHistory" element={<MedicalHistory userId={userdata.userId} token={token}/>}/>
                         </Routes> 
                 </div>
             </div>

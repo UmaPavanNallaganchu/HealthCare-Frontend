@@ -1,7 +1,6 @@
 import React,{useState} from 'react';
 import '../CssFiles/LoginRegister.css';
-
-const SignUp = () => {
+const SignUp = ({back}) => {
     const role = 'PATIENT';
     const [gender, setGender] = useState('');
     const [email, setEmail] = useState('');
@@ -73,6 +72,7 @@ const SignUp = () => {
                 if (response.ok) {
                     const data = await response.json();
                     console.log('SignUp successful:', data);
+                    back('SignIn');
                 } else {
                     const data = await response.json();
                     console.error('SignUp failed:', data);
