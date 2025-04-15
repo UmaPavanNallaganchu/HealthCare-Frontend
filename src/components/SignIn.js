@@ -32,8 +32,7 @@ const SignIn = ({ setLoggedIn }) =>{
                 const decodedToken = jwtDecode(data.data);
                 localStorage.setItem('jwtToken',data.data);
                 console.log('Login successful:', decodedToken);
-                localStorage.setItem('userLoggedIn',JSON.stringify(decodedToken));
-                setLoggedIn(true);
+                GettingUserName(data.data,decodedToken);
             } else {
                 const data = await response.json();
                 console.log(data);
@@ -43,6 +42,38 @@ const SignIn = ({ setLoggedIn }) =>{
             console.error('Error:', error);
         }
         
+    }
+
+    const GettingUserName =async(token,decodedToken)=>{
+        try{
+           const apiUrl = `http://localhost:8086/api/users/${decodedToken.userId}`
+            const response = await fetch(apiUrl,{
+            method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                if(decodedToken.role === 'DOCTOR'){
+                   decodedToken.name = data.data.doctor.name;
+                   localStorage.setItem('userLoggedIn',JSON.stringify(decodedToken));
+                   setLoggedIn(true);
+                }
+                else{
+                    decodedToken.name = data.data.patient.name;
+                   localStorage.setItem('userLoggedIn',JSON.stringify(decodedToken));
+                   setLoggedIn(true);
+                }
+            } else {
+                const data = await response.json();
+                console.log(data);
+                setErrors("login failed :"+ data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
     return (
         <div className='loginpage'>

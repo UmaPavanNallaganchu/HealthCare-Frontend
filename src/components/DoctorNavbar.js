@@ -46,13 +46,13 @@ function DoctorNavbar({userdata,token}) {
     <div className="navbarcss">
       <div className="profile">
         <FontAwesomeIcon className="profileIcon" icon={faUser} onClick={handleProfile} />
-        <p>{userdata.userId}</p>
+        <p>{userdata.name}</p>
       </div>
       <nav>
         <ul>
           <li><Link to="/edit-profile"><FontAwesomeIcon icon={faUserEdit} /> &nbsp; Edit Profile</Link></li>
-          <li><Link to="/manageAvailability"><FontAwesomeIcon icon={faCalendarCheck} /> &nbsp; Manage Availability</Link></li>
-          <li><Link to="/consultations"><FontAwesomeIcon icon={faHistory} /> &nbsp; All Consultations</Link></li>
+          <li><Link to="/myAvailability"><FontAwesomeIcon icon={faCalendarCheck} /> &nbsp; Manage Availability</Link></li>
+          <li><Link to="/consultations"><FontAwesomeIcon icon={faHistory} /> &nbsp; Manage Consultations</Link></li>
           <li><a href="/" onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt} /> &nbsp; Logout</a></li>
         </ul>
       </nav>

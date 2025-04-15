@@ -1,0 +1,35 @@
+.filter-container{
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.doctortable{
+  align-items: center;
+  justify-content: space-evenly;
+  text-align: center;
+  width: 100%;
+}
+
+.doctortable table tbody {
+  display: block;
+  max-height: 350px; /* Adjust the height as needed */
+  overflow-y: auto;
+}
+
+.doctortable table thead, .doctortable table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.doctortable table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.doctortable table th, .doctortable table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}

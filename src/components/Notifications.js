@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "../CssFiles/notifications.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
-const Notifications = ({ tab, userType ,token}) => {
+const Notifications = ({ tab, userType ,token,userId}) => {
   const [notifications, SetNotifications] = useState([]);
   const timeMap = {
     "NINE_TO_ELEVEN": "9:00 am - 11:00 am",
@@ -34,7 +34,6 @@ const mapTimeSlotInMessage = (message, timeSlot) => {
     try {
       const HandleNotification = async () => {
         // const userId = JSON.parse(localStorage.getItem('userLoggedIn'));
-        const userId = "21a4554c-5be2-4f34-971f-99c9eed18934";
         const apiUrl =
           userType === "DOCTOR"
             ? `http://localhost:8089/notifications/fetchByDoctorOrPatient?doctorId=${userId}`

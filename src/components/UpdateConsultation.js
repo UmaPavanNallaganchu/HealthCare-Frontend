@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from "react";
-import Modal from "react-modal";
  
-const UpdateConsultationForm = ({ isOpen, onClose, appointmentId ,token}) => {
+const UpdateConsultationForm = ({ isOpen, onClose, appointmentId, onSubmit ,token}) => {
     const [notes, setNotes] = useState("");
     const [prescription, setPrescription] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
  
     useEffect(() => {
-        if (appointmentId) {
+        if (isOpen && appointmentId) {
             fetch(`http://localhost:8050/consultation/appointment/${appointmentId}`,{
                 method:'GET',
                 headers:{
                     "Content-Type": "application/json",
                     'Authorization': `Bearer ${token}`
-                }
-            })
+                }})
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.data.length > 0) {
-                        const consultation = data.data[0]; //Only one consultation per appointment
+                        const consultation = data.data[0];
                         setNotes(consultation.notes);
                         setPrescription(consultation.prescription);
                     }
@@ -27,8 +25,12 @@ const UpdateConsultationForm = ({ isOpen, onClose, appointmentId ,token}) => {
                 .catch(error => {
                     console.error("Error fetching consultation details:", error);
                 });
+        } else if (!isOpen) {
+            setNotes("");
+            setPrescription("");
+            setMessage("");
         }
-    }, [appointmentId]);
+    }, [isOpen, appointmentId]);
  
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -41,6 +43,7 @@ const UpdateConsultationForm = ({ isOpen, onClose, appointmentId ,token}) => {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(consulData),
             });
@@ -52,6 +55,9 @@ const UpdateConsultationForm = ({ isOpen, onClose, appointmentId ,token}) => {
                 setTimeout(() => {
                     setLoading(false);
                     onClose();
+                    if (onSubmit) {
+                        onSubmit(appointmentId);
+                    }
                 }, 2000);
             } else {
                 setMessage("Error updating consultation. Please try again.");
@@ -65,68 +71,63 @@ const UpdateConsultationForm = ({ isOpen, onClose, appointmentId ,token}) => {
         }
     };
  
-    return (
-        <Modal isOpen={isOpen} onRequestClose={onClose} contentLabel="Update Consultation">
-            <div style={{
-                padding: "20px", width: "400px", backgroundColor: "#f9f9f9",
-                borderRadius: "10px", boxShadow: "0px 4px 8px rgba(0,0,0,0.1)",
-                position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)"
-            }}>
-                <h2 style={{ color: "#333", textAlign: "center" }}>✏️ Update Consultation</h2>
-                {message && <p style={{ color: message.includes("success") ? "green" : "red", textAlign: "center" }}>{message}</p>}
+    if (!isOpen) {
+        return null;
+    }
  
-                <form onSubmit={handleSubmit}>
-                    <label><strong>Appointment ID:</strong> {appointmentId}</label>
+    return (
+        <div className="modal-overlay">
+            <div className="modal-container">
+                <h2 className="modal-title">✏️ Update Consultation</h2>
+                {message && <p className={message.includes("success") ? "success-message" : "error-message"}>{message}</p>}
+ 
+                <form onSubmit={handleSubmit} className="consultation-form">
+                    <label className="form-label">
+                        <strong>Appointment ID:</strong> {appointmentId}
+                    </label>
                     <br />
  
-                    <label>Notes:</label>
+                    <label className="form-label">Notes:</label>
                     <textarea
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Enter consultation notes..."
                         required
                         maxLength={500}
-                        style={{ width: "100%", height: "80px", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        className="form-textarea"
                     />
                     <br />
  
-                    <label>Prescription:</label>
+                    <label className="form-label">Prescription:</label>
                     <input
                         type="text"
                         value={prescription}
                         onChange={(e) => setPrescription(e.target.value)}
                         placeholder="Enter prescribed medicine..."
                         required
-                        style={{ width: "100%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        className="form-input"
                     />
                     <br />
  
-                    <button type="submit"
-                        style={{
-                            marginTop: "15px", padding: "10px", width: "100%",
-                            backgroundColor: loading ? "#888" : "#ffa500", color: "white",
-                            border: "none", borderRadius: "5px", cursor: loading ? "not-allowed" : "pointer"
-                        }}
+                    <button
+                        type="submit"
+                        className={`form-button ${loading ? "disabled-button" : ""}`}
                         disabled={loading}
                     >
                         {loading ? "Updating..." : "Update Consultation"}
                     </button>
  
-                    <button type="button" onClick={onClose}
-                        style={{
-                            marginTop: "10px", padding: "10px", width: "100%",
-                            backgroundColor: "#bbb", color: "white",
-                            border: "none", borderRadius: "5px",
-                            cursor: "pointer"
-                        }}
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="form-button cancel-button"
                     >
                         Cancel
                     </button>
                 </form>
             </div>
-        </Modal>
+        </div>
     );
 };
  
 export default UpdateConsultationForm;
- 
