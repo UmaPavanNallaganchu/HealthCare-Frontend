@@ -26,7 +26,8 @@ const DoctorTable = ({token,patientId,patientName}) => {
         const data = await response.json();
 
         if (data.success && data.data) {
-          setDisplayDoctors(data.data);
+          console.log(data.data);
+          filterFutureAppointments(data.data);
           setFetchError(null);
         } else {
           setFetchError('Failed to fetch doctor data. Please try again later.');
@@ -38,6 +39,32 @@ const DoctorTable = ({token,patientId,patientName}) => {
 
     fetchData();
   }, []);
+
+  const filterFutureAppointments = (data) => {
+    const currentDate = new Date();
+    const filteredData = data.filter(appointment => {
+        const appointmentDate = new Date(appointment.date);
+        const [startHour, endHour] = appointment.timeSlots.split('_TO_').map(time => {
+            switch (time) {
+                case 'FOUR': return 4;
+                case 'SIX': return 6;
+                case 'TWO': return 2;
+                case 'NINE': return 9;
+                case 'ELEVEN': return 11;
+                case 'ONE': return 1;
+                default: return parseInt(time);
+            }
+        });
+
+        // Check if the appointment date is in the future or if it's today and the time slot is in the future
+        return appointmentDate > currentDate || 
+               (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < endHour);
+    });
+    setDisplayDoctors(filteredData);
+};
+
+
+
 
   const filteredDoctors = displayDoctors.filter(doctor =>
     (specialization ? doctor.specialization === specialization : true) &&
@@ -84,12 +111,21 @@ const DoctorTable = ({token,patientId,patientName}) => {
           <option value="">All</option>
           <option value="General">General</option>
           <option value="Neurology">Neurology</option>
-          <option value="Orthology">Orthology</option>
+          <option value="Cardiology">Cardiology</option>
+          <option value="Gynaecology">Gynaecology</option>
+          <option value="Orthodontics">Orthodontics</option>
+          <option value="Pulmonology">Pulmonology</option>
+          <option value="Nephrology">Nephrology</option>
+          <option value="Oncology">Oncology</option>
+          <option value="Dermatology">Dermatology</option>
+          <option value="Psychology">Psychology</option>
         </select>
         <label>Date:</label>
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-        <label>Search:</label>
-        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} />
+      </div>
+      <div className='filter-container'>
+      <label>Search:</label>
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder='search doctor name' />
         <label>Time Slot:</label>
         <select value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)}>
           <option value="">All</option>

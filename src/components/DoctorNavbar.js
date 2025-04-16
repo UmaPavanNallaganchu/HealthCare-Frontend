@@ -55,7 +55,7 @@ function DoctorNavbar({userdata,token}) {
       <nav>
         <ul>
           <li><Link to="/edit-profile"><FontAwesomeIcon icon={faUserEdit} /> &nbsp; Edit Profile</Link></li>
-          <li><Link to="/myAvailability"><FontAwesomeIcon icon={faCalendarCheck} /> &nbsp; Manage Availability</Link></li>
+          <li><Link to="/"><FontAwesomeIcon icon={faCalendarCheck} /> &nbsp; Manage Availability</Link></li>
           <li><Link to="/consultations"><FontAwesomeIcon icon={faHistory} /> &nbsp; Manage Consultations</Link></li>
           <li><a href="/" onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt} /> &nbsp; Logout</a></li>
         </ul>

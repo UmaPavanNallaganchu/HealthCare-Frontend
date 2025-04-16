@@ -84,8 +84,8 @@ const MedicalHistory = ({userId,token}) => {
  
   return (
     <div className="medicalHistory">
-      <h2>Medical History for  (ID: {userId})</h2>
-      {history ? (
+      <h2>My Medical History</h2>
+      {history.length != 0 ? (
         <table>
           <thead>
             <tr>

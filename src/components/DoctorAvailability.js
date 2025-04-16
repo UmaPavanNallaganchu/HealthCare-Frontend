@@ -1,28 +1,28 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import "../CssFiles/Availability.css"
-
+import "../CssFiles/Availability.css";
+ 
 const DoctorAvailability = ({token,doctorId}) => {
   const now = useMemo(() => Date.now(), []);
-
+ 
   const getStartOfWeek = useCallback((date) => {
     const day = date.getDay();
     const diff = date.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(date.setDate(diff));
   }, []);
-
+ 
   const todayAtMount = useMemo(() => new Date(), []);
   const todayString = useMemo(() => todayAtMount.toDateString(), [todayAtMount]);
-
+ 
   const startOfWeek = useMemo(() => getStartOfWeek(new Date(todayAtMount)), [getStartOfWeek, todayAtMount]);
   const endOfWeek = useMemo(() => new Date(new Date(startOfWeek).setDate(startOfWeek.getDate() + 4)), [startOfWeek]);
-
+ 
   const getNextWeekStart = useCallback((startDate) => {
     return new Date(new Date(startDate).setDate(startDate.getDate() + 7));
   }, []);
-
+ 
   const nextWeekStart = useMemo(() => getNextWeekStart(startOfWeek), [getNextWeekStart, startOfWeek]);
   const nextWeekEnd = useMemo(() => new Date(new Date(nextWeekStart).setDate(nextWeekStart.getDate() + 4)), [nextWeekStart]);
-
+ 
   const [currentWeek, setCurrentWeek] = useState({ start: startOfWeek, end: endOfWeek });
   const [availability, setAvailability] = useState(
     Array(4)
@@ -32,7 +32,8 @@ const DoctorAvailability = ({token,doctorId}) => {
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState(null);
-
+ 
+ 
   const timeslotMapping = useMemo(
     () => ({
       NINE_TO_ELEVEN: "9:00 AM - 11:00 AM",
@@ -42,22 +43,22 @@ const DoctorAvailability = ({token,doctorId}) => {
     }),
     []
   );
-
+ 
   const timeslots = useMemo(() => Object.values(timeslotMapping), [timeslotMapping]);
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-
+ 
   const isPreviousDisabled = useMemo(() => getStartOfWeek(todayAtMount).toDateString() === currentWeek.start.toDateString(), [getStartOfWeek, todayAtMount, currentWeek.start]);
   const isNextDisabled = useMemo(() => getNextWeekStart(getStartOfWeek(todayAtMount)).toDateString() === currentWeek.start.toDateString(), [getNextWeekStart, getStartOfWeek, todayAtMount, currentWeek.start]);
-
+ 
   const formatDate = useCallback((date) => {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
   }, []);
-
+ 
   const generateDatesForWeek = useCallback((startDate) => {
     const dates = [];
     const start = new Date(startDate); // Create a new Date object from startDate
     start.setHours(0, 0, 0, 0); // Ensure the start of the week has no time component
-  
+ 
     for (let i = 0; i < 5; i++) {
       const newDate = new Date(start); // Create a *new* Date object based on the *initial* 'start'
       newDate.setDate(start.getDate() + i); // Increment the *newDate*
@@ -69,16 +70,16 @@ const DoctorAvailability = ({token,doctorId}) => {
     }
     return dates;
   }, [days, formatDate]);
-
+ 
   const updateAvailability = useCallback(
     (data) => {
       const updatedAvailability = Array(4)
         .fill(null)
         .map(() => Array(5).fill({ status: "Unavailable", availabilityId: null }));
-
+ 
       const currentToday = new Date();
       console.log("Current 'today' in updateAvailability:", currentToday.toDateString());
-
+ 
       data.forEach((slot) => {
         console.log("slot:", slot); // LOG 1: Check the entire slot object
         console.log("slot.timeSlots:", slot.timeSlots); // LOG 2: Check the raw timeSlots value from backend
@@ -89,17 +90,17 @@ const DoctorAvailability = ({token,doctorId}) => {
         const dayIndex = slotDate.getDay() - 1;
         const timeslotsArray = timeSlotString ? timeSlotString.split(" - ")[0].split(":") : []; // Safe split
         console.log("timeslotsArray:", timeslotsArray); // LOG 4: Check the array after splitting the start time
-
+ 
         let startTimeHours = 0;
         let startTimeMinutes = 0;
         let ampm = "";
-
+ 
         if (timeslotsArray.length >= 2) {
           startTimeHours = parseInt(timeslotsArray[0], 10);
           const minutesAndAmPm = timeslotsArray[1];
           startTimeMinutes = parseInt(minutesAndAmPm.substring(0, 2), 10);
           ampm = minutesAndAmPm.substring(2).trim().toUpperCase();
-
+ 
           if (ampm === "PM" && startTimeHours !== 12) {
             startTimeHours += 12;
           } else if (ampm === "AM" && startTimeHours === 12) {
@@ -108,13 +109,13 @@ const DoctorAvailability = ({token,doctorId}) => {
         } else if (timeslotsArray.length === 1) {
           startTimeHours = parseInt(timeslotsArray[0], 10); // Handle cases with only hour
         }
-
+ 
         const slotStartTime = new Date(slotDate);
         slotStartTime.setHours(startTimeHours, startTimeMinutes, 0, 0);
         console.log(`  Current Day Slot: Start Time=${slotStartTime}, Now=${new Date(now)}, Is Past=${slotStartTime.getTime() < now}`);
         let calculatedStatus = slot.status;
         if (slotDate.toDateString() === currentToday.toDateString()) {
-          if (slotStartTime.getTime() < now && slot.status !== "Booked") {
+          if (slotStartTime.getTime() < now) {
             calculatedStatus = "Unavailable";
             console.log("  Marking as Unavailable (Past Time - Initial Fetch)");
           }
@@ -125,7 +126,7 @@ const DoctorAvailability = ({token,doctorId}) => {
           calculatedStatus = "Unavailable";
           console.log("  Marking as Unavailable (Past Day)");
         }
-
+ 
         const timeIndex = timeslots.indexOf(timeSlotString);
         if (timeIndex !== -1 && dayIndex >= 0 && dayIndex < 5) {
           updatedAvailability[timeIndex][dayIndex] = {
@@ -142,7 +143,7 @@ const DoctorAvailability = ({token,doctorId}) => {
     },
     [timeslots, timeslotMapping, now, formatDate]
   );
-
+ 
   const fetchAvailability = useCallback(
     async (startDate, endDate) => {
       setError(null);
@@ -170,11 +171,11 @@ const DoctorAvailability = ({token,doctorId}) => {
     },
     [doctorId, updateAvailability]
   );
-
+ 
   const navigateWeek = useCallback((direction) => {
     let newStartOfWeek;
     let newEndOfWeek;
-
+ 
     if (direction === "previous") {
       newStartOfWeek = new Date(currentWeek.start);
       newStartOfWeek.setDate(newStartOfWeek.getDate() - 7);
@@ -186,21 +187,21 @@ const DoctorAvailability = ({token,doctorId}) => {
       newEndOfWeek = new Date(newStartOfWeek);
       newEndOfWeek.setDate(newEndOfWeek.getDate() + 4);
     }
-
+ 
     if (newStartOfWeek && newEndOfWeek) {
       setCurrentWeek({ start: newStartOfWeek, end: newEndOfWeek });
     }
   }, [currentWeek.start]);
-
+ 
   const weekDates = useMemo(() => generateDatesForWeek(currentWeek.start), [generateDatesForWeek, currentWeek.start]);
-
+ 
   useEffect(() => {
     const startDateISO = currentWeek.start.toISOString().split("T")[0];
     const endDateISO = currentWeek.end.toISOString().split("T")[0];
     console.log("useEffect triggered, fetching for:", startDateISO, endDateISO);
     fetchAvailability(startDateISO, endDateISO);
   }, [currentWeek.start, currentWeek.end, fetchAvailability]);
-
+ 
   const openModal = useCallback((timeIndex, dayIndex, isPast, fullDate, timeslot) => {
     const slotData = availability[timeIndex][dayIndex];
     const timePart = timeslot.split(" - ")[0];
@@ -209,7 +210,7 @@ const DoctorAvailability = ({token,doctorId}) => {
     let startTimeMinutes = 0;
     let ampmMatch = timePart.match(/([AP]M)$/i);
     let ampm = ampmMatch ? ampmMatch[1].toUpperCase() : "";
-
+ 
     if (parts.length > 1) {
       startTimeMinutes = parseInt(parts[1].substring(0, 2), 10);
     }
@@ -229,7 +230,7 @@ const DoctorAvailability = ({token,doctorId}) => {
       (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() < today.getMonth()) ||
       (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() === today.getMonth() && calendarDate.getDate() < today.getDate())
     );
-
+ 
     console.log("Clicked Slot:", { timeIndex, dayIndex, isPast, fullDate, timeslot, slotData });
     console.log("  Is Current Day Past Time Slot:", isPastTimeSlot);
     console.log("Check",fullDate,slotStartTime.getTime(),!isPastTimeSlot,slotStartTime);
@@ -238,12 +239,12 @@ const DoctorAvailability = ({token,doctorId}) => {
       setModalOpen(true);
     }
   }, [availability, todayString]);
-
+ 
   const closeModal = useCallback(() => {
     setSelectedSlot(null);
     setModalOpen(false);
   }, []);
-
+ 
   const toggleSlot = useCallback(async (status, availabilityId) => {
     setError(null);
     const endpoint =
@@ -251,7 +252,14 @@ const DoctorAvailability = ({token,doctorId}) => {
         ? `http://localhost:8000/availability/block/${availabilityId}`
         : `http://localhost:8000/availability/release/${availabilityId}`;
     try {
-      const response = await fetch(endpoint, { method: "PUT" });
+      const response = await fetch(endpoint, { 
+        method: "PUT",
+        headers:{
+          'Content-type':"Application/json",
+          'Authorization': `Bearer ${token}`
+          }
+          
+       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -262,7 +270,7 @@ const DoctorAvailability = ({token,doctorId}) => {
     }
     closeModal();
   }, [fetchAvailability, closeModal, currentWeek.start, currentWeek.end]);
-
+ 
   if (error) {
     return <div className="error-container">{error}</div>;
   }
@@ -292,22 +300,22 @@ const DoctorAvailability = ({token,doctorId}) => {
                 let startTimeMinutes = 0;
                 let ampmMatch = timePart.match(/([AP]M)$/i);
                 let ampm = ampmMatch ? ampmMatch[1].toUpperCase() : "";
-
+ 
                 if (parts.length > 1) {
                   startTimeMinutes = parseInt(parts[1].substring(0, 2), 10);
                 }
-
+ 
                 if (ampm === "PM" && adjustedHours !== 12) {
                   adjustedHours += 12;
                 } else if (ampm === "AM" && adjustedHours === 12) {
                   adjustedHours = 0;
                 }
-
+ 
                 const slotStartTime = new Date(dateEntry.fullDate);
                 slotStartTime.setHours(adjustedHours, startTimeMinutes, 0, 0);
                 const isCurrentDay = dateEntry.fullDate.toDateString() === todayString;
                 const isPastTimeSlot = isCurrentDay && slotStartTime.getTime() < Date.now();
-                
+               
                 const today = new Date();
                 const calendarDate = dateEntry.fullDate;
                 const isPastDay = (
@@ -315,7 +323,7 @@ const DoctorAvailability = ({token,doctorId}) => {
                   (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() < today.getMonth()) ||
                   (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() === today.getMonth() && calendarDate.getDate() < today.getDate())
                 );
-                
+               
                 const shouldDisable = slotData.status === "Booked" || slotData.status === "Blocked" || (isCurrentDay && isPastTimeSlot) || isPastDay;
                 const slotClassName = `slot ${slotData.status.toLowerCase()} ${shouldDisable ? 'disabled' : ''}`;
                 const isClickable = !shouldDisable;
@@ -355,7 +363,7 @@ const DoctorAvailability = ({token,doctorId}) => {
           Next Week →
         </button>
       </div>
-
+ 
       {isModalOpen && selectedSlot && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -395,5 +403,6 @@ const DoctorAvailability = ({token,doctorId}) => {
     </div>
   );
 };
-
+ 
 export default DoctorAvailability;
+ 

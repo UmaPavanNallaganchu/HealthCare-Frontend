@@ -2,7 +2,7 @@ import React, { useState }  from "react";
 import "../CssFiles/PatientNavbar.css";
 import {Link} from'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser ,faUserEdit, faSignOutAlt, faCalendarAlt, faNotesMedical ,faClipboardList} from '@fortawesome/free-solid-svg-icons';
+import {faUserEdit, faSignOutAlt,faCalendarCheck, faCalendarAlt, faNotesMedical ,faClipboardList} from '@fortawesome/free-solid-svg-icons';
 import patientimage from '../assets/patient.png';
 function PatientNavBar({userdata,token}){
     const [popup, setPopup] = useState(false);
@@ -53,8 +53,8 @@ function PatientNavBar({userdata,token}){
             <nav>
                 <ul>
                 <li><Link to="/edit-profile"><FontAwesomeIcon icon={faUserEdit} /> &nbsp; Edit Profile</Link></li>
-                <li><Link to="/manage-bookings"><FontAwesomeIcon icon={faCalendarAlt} />  &nbsp; Manage Bookings</Link></li>
-                <li><Link to="/myAppointments"><FontAwesomeIcon icon={faCalendarAlt} />  &nbsp; My Appointments</Link></li>
+                <li><Link to="/"><FontAwesomeIcon icon={faCalendarAlt} />  &nbsp; Manage Bookings</Link></li>
+                <li><Link to="/myAppointments"><FontAwesomeIcon icon={faCalendarCheck} />  &nbsp; My Appointments</Link></li>
                 <li><Link to="/myConsultations"><FontAwesomeIcon icon={faClipboardList} /> &nbsp; My Consultations</Link></li>
                 <li><Link to="/medicalHistory"><FontAwesomeIcon icon={faNotesMedical} />  &nbsp; Medical History</Link></li>
                 <li><a href="/" onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt} /> &nbsp; Logout</a></li>

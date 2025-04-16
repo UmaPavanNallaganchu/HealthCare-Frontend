@@ -24,7 +24,7 @@
   }
   
   .nav-button {
-    background-color: #007bff;
+    background-color: #2db9a8;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -35,7 +35,7 @@
   }
   
   .nav-button:hover {
-    background-color: #0056b3;
+    background-color: #289C8E;
   }
   
   .disabled-button {
@@ -58,7 +58,7 @@
   
   .current-day {
     font-weight: bold;
-    background-color: #2cdaf1; /* Light blue to highlight current day */
+    background-color: #5eb1f9; /* Light blue to highlight current day */
   }
   
   .timeslot-label {
@@ -76,7 +76,7 @@
   }
   
   .available {
-    background-color: rgb(162, 219, 69);
+    background-color: rgb(69, 219, 92);
     color: white;
     cursor: pointer;
   }
@@ -88,7 +88,7 @@
   }
   
   .booked {
-    background-color: #a92723; /* Even darker red for booked */
+    background-color: #fa5842; /* Even darker red for booked */
     color: white;
   }
   
@@ -153,7 +153,7 @@
   }
   
   .modal-button {
-    background-color: #007bff;
+    background-color: #289C8E;
     color: white;
     border: none;
     padding: 10px 20px;

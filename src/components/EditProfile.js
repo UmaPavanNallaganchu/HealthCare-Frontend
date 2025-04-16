@@ -10,10 +10,6 @@ const EditProfile = ({userdata,token}) => {
     const [gender, setGender] = useState('');
     const [specialization, setSpecialization] = useState('');
     const [errors, setErrors] = useState({});
-    const [popup, setPopup] = useState(false);
-    const[existingPassword,setExistingPassword]=useState('');
-    const [newPassword,setNewpassword] = useState('');
-    const [retypePassword,setRetypepassword] = useState('');
     useEffect(() => {
         console.log('Fetching user data...');
         const HandleGetData = async () => {
@@ -52,10 +48,6 @@ const EditProfile = ({userdata,token}) => {
         };
         HandleGetData();
     }, []);
-
-    const closePopup = () => {
-        setPopup(false);
-      };
 
     const validateForm = () => {
         let formErrors = {};
@@ -122,9 +114,6 @@ const EditProfile = ({userdata,token}) => {
         }
     };
 
-    const handleResetPassword = () => {
-        setPopup(true);
-    };
 
     return (
         <div className='editProfile'>
@@ -165,21 +154,9 @@ const EditProfile = ({userdata,token}) => {
                     <label>Specialization: {specialization}</label>
                 )}
 
-               <div className='buttons'> <button type='button' onClick={handleResetPassword}>Reset Password</button>
+               <div className='buttons'>
                 <button type='submit'>Update</button> </div>
             </form>
-
-            {popup  && (
-        <div className="popup">
-        <span className="close" onClick={closePopup}>&times;</span>
-          <div className="resetpassword">
-            <input type="password" value={existingPassword}  placeholder="existing password" onChange ={(e)=>setExistingPassword(e.target.value)}/>
-            <input type="password" value={newPassword} placeholder="new password" onChange={(e)=>setNewpassword(e.target.value)}/>
-            <input type="password" value={retypePassword}  placeholder="retype password" onChange={(e)=>setRetypepassword(e.target.value)}/>
-            <button>Reset</button>
-          </div>
-        </div>
-      )}
 
         </div>
     );

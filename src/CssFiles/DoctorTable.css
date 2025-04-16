@@ -2,7 +2,14 @@
   display: flex;
   flex-direction: row;
   margin-bottom: 10px;
-  width: 100%;
+  width: 95%;
+  justify-content: space-evenly;
+}
+.filter-container input{
+  width: 30%;
+}
+.filter-container select{
+  width: 30%;
 }
 .doctortable{
   display: flex;
@@ -27,7 +34,7 @@
 }
 
 .doctortable table {
-  width: 90%;
+  width: 95%;
   border-collapse: collapse;
 }
 

@@ -8,7 +8,9 @@ import {faTimesCircle, faCheckCircle, faCalendarCheck } from '@fortawesome/free-
 
 const ViewAppointments = ({ patientId, token }) => {
     const [appointments, setAppointments] = useState([]);
-
+    const [doctorforRescheduling,setDoctorforRescheduling] = useState([]);
+    const [IsReschedule,setIsReschedule] = useState(false);
+    const [IdforReschedule,setIdforReschedule]=useState();
     useEffect(() => {
         const retrieveData = async () => {
             const apiUrl = `http://localhost:8065/appointments/viewByPatient/${patientId}`;
@@ -32,25 +34,93 @@ const ViewAppointments = ({ patientId, token }) => {
     }, [patientId, token]);
 
     const handleCancel = async (id) => {
-        const apiUrl = `http://localhost:8065/appointments/cancel/${id}`;
-        const response = await fetch(apiUrl, {
-            method: 'DELETE',
-            headers: {
-                "Content-Type": "application/json",
-                'Authorization': `Bearer ${token}`
+        const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
+        if (confirmCancel) {
+            const apiUrl = `http://localhost:8065/appointments/cancel/${id}`;
+            const response = await fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            if (response.ok) {
+                console.log("Cancelled Successfully", response);
+                alert("Appointment Cancelled");
+                // Optionally, refresh the appointments list
+                setAppointments(appointments.filter(appointment => appointment.appointmentId !== id));
+            } else {
+                console.log("Unable to Cancel");
             }
-        });
-
-        if (response.ok) {
-            console.log("Cancelled Successfully", response);
-        } else {
-            console.log("Unable to Cancel");
         }
     };
+    
     const handleRedirect = () => {
           window.location.href = "/myConsultations";
       };
 
+    const handleUpdate = async(appointmentId,doctorId) =>{
+       const apiUrl = `http://localhost:8000/availability/doctor/${doctorId}`;
+       const response = await fetch(apiUrl,{
+            method:'GET',
+            headers:{
+                'Content-type':'Application/json',
+                'Authorization': `Bearer ${token}`
+            }
+       });
+       
+       if(response.ok){
+        const data = await response.json();
+            filterFutureAppointments(data);
+            setIsReschedule(true);
+            setIdforReschedule(appointmentId);
+       }
+    };
+
+
+    const ReScheduleDoctor = async(Id) =>{
+        const apiUrl = `http://localhost:8065/appointments/update/${IdforReschedule}/${Id}`;
+        const response = await fetch(apiUrl,{
+            method:'PUT',
+            headers:{
+                'Content-type':'Application/json',
+                'Authorization': `Bearer ${token}`
+            }
+       });
+       if(response.ok){
+            alert("appointment Rescheduled Successfully");
+       }
+       else{
+            console.log("unable to Reschedule appointment");
+       }
+    }
+
+
+    const filterFutureAppointments = (data) => {
+        const currentDate = new Date();
+        const filteredData = data.filter(appointment => {
+            const appointmentDate = new Date(appointment.date);
+            const [startHour, endHour] = appointment.timeSlots.split('_TO_').map(time => {
+                switch (time) {
+                    case 'FOUR': return 4;
+                    case 'SIX': return 6;
+                    case 'TWO': return 2;
+                    case 'NINE': return 9;
+                    case 'ELEVEN': return 11;
+                    case 'ONE': return 1;
+                    default: return parseInt(time);
+                }
+            });
+    
+            // Check if the appointment date is in the future or if it's today and the time slot is in the future
+            return appointmentDate > currentDate || 
+                   (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < endHour);
+        });
+            setDoctorforRescheduling(filteredData);
+    };
+
+    
     return (
         <div className="appointmentdetails">
             {appointments.length === 0 ? (
@@ -67,10 +137,45 @@ const ViewAppointments = ({ patientId, token }) => {
                         <p><strong>Status:</strong> {appointment.status}</p>
                         {appointment.status === "Booked" && <button onClick={() => handleCancel(appointment.appointmentId)}>Cancel Appointment</button>}
                         {appointment.status === "Completed" && <button onClick={() => handleRedirect()}>View Consultation</button>}
+                        {appointment.status === "Booked" && <button style={{backgroundColor:"orange",marginLeft:"10px"}} onClick={() => handleUpdate(appointment.appointmentId,appointment.doctorId)}>Reschedule Appointment</button>}
 
                     </div>
                 ))
             )}
+
+            {IsReschedule && <div className="modal-overlay">
+            <div className="tablecontainer">
+            <div className="msg">
+            <h3>Select the Date and TimeSlot to Reschedule</h3>   
+            <FontAwesomeIcon icon={faTimesCircle} style={{color:"red",fontSize:"24px"}} onClick={()=>{setIsReschedule(false)}}/>
+            </div>
+            <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Specialization</th>
+              <th>Date</th>
+              <th>Time Slot</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {doctorforRescheduling.map((doctor, index) => (
+              <tr key={index}>
+                <td>{doctor.doctorName}</td>
+                <td>{doctor.specialization}</td>
+                <td>{doctor.date}</td>
+                <td>{doctor.timeSlots}</td>
+                <td>
+                  <button onClick={() => ReScheduleDoctor(doctor.availabilityId)}>Select</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+        </div>
+        }
         </div>
     );
 };

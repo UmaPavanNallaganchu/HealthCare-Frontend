@@ -91,7 +91,7 @@
   padding: 10px 20px;
   margin-right: 8px;
   border: none;
-  background-color: #007bff;
+  background-color: #289C8E;
   color: white;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -99,7 +99,7 @@
 }
 
 .dashboard button:hover {
-  background-color: #0056b3;
+  background-color: #289C8E;
 }
 
 .dashboard .update-button {

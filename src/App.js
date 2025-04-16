@@ -28,7 +28,7 @@ function App() {
           <DoctorDashBoard />
         )
       ) : (
-        <LoginandRegister setLoggedIn={setLoggedIn} />
+        <LoginandRegister setLoggedIn={setLoggedIn}  setLoginDetails={setLoginDetails}/>
       )}
     </div>
   );

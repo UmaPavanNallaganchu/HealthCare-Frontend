@@ -3,7 +3,7 @@ import { FaFilter } from "react-icons/fa"; // Import filter icon
 import ConsultationForm from "./ConsultationForm";
 import UpdateConsultationForm from "./UpdateConsultation";
 import "../CssFiles/generalCss.css";
- 
+ import "..//CssFiles/MedicalHistoryModel.css";
 const AppointmentList = ({ doctorId, token }) => {
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
@@ -156,7 +156,7 @@ const handleOpenModal = async (appointmentId) => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer  ${token}`,
           },
         }
       );
@@ -176,7 +176,7 @@ const handleOpenModal = async (appointmentId) => {
       setShowHistoryModal(true);
     } catch (error) {
       alert(
-        `Patient ID ${patientId} has not created their medical history yet.`
+        `Failed to retrieve medical history for Patient ID ${patientId}.`
       );
       setHistoryData([{ healthHistory: "Failed to retrieve medical history." }]);
       setShowHistoryModal(true);
@@ -399,46 +399,39 @@ const handleOpenModal = async (appointmentId) => {
         </table>
       )}
  
-      {/* Medical History Modal */}
-      <div
-        className={`modal ${showHistoryModal ? "show" : ""}`}
-        tabIndex="-1"
-        role="dialog"
-        style={{ display: showHistoryModal ? "block" : "none" }}
-      >
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                Medical History (Patient ID: {selectedPatientId})
-              </h5>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-                onClick={() => setShowHistoryModal(false)}
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body">
-              {historyData.length > 0 ? (
-                <ul>
-                  {historyData.map((record, index) => (
-                    <li key={index}>{record.healthHistory}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-danger fw-bold">
-                  Patient ID {selectedPatientId} has not created their medical
-                  history yet.
-                </p>
-              )}
-            </div>
+ {showHistoryModal && (
+      <div className="medical-history-modal-overlay">
+        <div className="medical-history-modal">
+          <div className="modal-header">
+            <h5 className="modal-title">
+              Medical History (Patient ID: {selectedPatientId})
+            </h5>
+            <button
+              type="button"
+              className="close-button"
+              onClick={() => setShowHistoryModal(false)}
+            >
+              &times;
+            </button>
+          </div>
+          <div className="modal-body">
+            {historyData.length > 0 ? (
+              <ul className="medical-history-list">
+                {historyData.map((record, index) => (
+                  <li key={index}>{record.healthHistory}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-danger fw-bold">
+                Patient ID {selectedPatientId} has not created their medical
+                history yet.
+              </p>
+            )}
           </div>
         </div>
       </div>
+    )}
+      
  
       {isModalOpen &&
         (isUpdate ? (

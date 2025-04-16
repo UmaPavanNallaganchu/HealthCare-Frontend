@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import '../CssFiles/LoginRegister.css';
 import { jwtDecode } from 'jwt-decode';
-const SignIn = ({ setLoggedIn }) =>{
+const SignIn = ({ setLoggedIn ,setLoginDetails}) =>{
     const[role,setRole] =useState('PATIENT');
     const[identifier,setIdentifier] =useState('');
     const[password,setPassword] = useState('');
@@ -59,12 +59,20 @@ const SignIn = ({ setLoggedIn }) =>{
                 if(decodedToken.role === 'DOCTOR'){
                    decodedToken.name = data.data.doctor.name;
                    localStorage.setItem('userLoggedIn',JSON.stringify(decodedToken));
-                   setLoggedIn(true);
+                   const userdata = localStorage.getItem('userLoggedIn');
+                    if (userdata) {
+                        setLoginDetails(JSON.parse(userdata));
+                        setLoggedIn(true);
+                    }
                 }
                 else{
                     decodedToken.name = data.data.patient.name;
                    localStorage.setItem('userLoggedIn',JSON.stringify(decodedToken));
-                   setLoggedIn(true);
+                   const userdata = localStorage.getItem('userLoggedIn');
+                   if (userdata) {
+                    setLoginDetails(JSON.parse(userdata));
+                    setLoggedIn(true);
+                   }
                 }
             } else {
                 const data = await response.json();

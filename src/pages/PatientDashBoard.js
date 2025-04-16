@@ -33,7 +33,7 @@ function PatientDashBoard(){
                 <Routes>
                         <Route path="/edit-profile" element={<EditProfile userdata={userdata} token={token}/>} />
                             {/* Add more routes here as needed */}
-                        <Route path="/manage-bookings" element={<DoctorTable token={token} patientId={userdata.userId} patientName={userdata.name}/>}></Route> 
+                        <Route path="/" element={<DoctorTable token={token} patientId={userdata.userId} patientName={userdata.name}/>}></Route> 
                         <Route path='/myConsultations' element={<PatientConsultations token={token} patientId={userdata.userId}/>}></Route>
                         <Route path='/myAppointments' element={<ViewAppointments token={token} patientId={userdata.userId}/>}></Route>
                         <Route path="/medicalHistory" element={<MedicalHistory userId={userdata.userId} token={token}/>}/>

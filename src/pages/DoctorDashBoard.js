@@ -32,7 +32,7 @@ function DoctorDashBoard() {
                         <Routes>
                             <Route path="/edit-profile" element={<EditProfile userdata={userdata} token={token}/>} />
                             <Route path='/consultations' element={<AppointmentList doctorId={userdata.userId} token={token}/>}/>
-                            <Route path='/myAvailability' element={<DoctorAvailability doctorId={userdata.userId} token={token}/>}></Route>
+                            <Route path='/' element={<DoctorAvailability doctorId={userdata.userId} token={token}/>}></Route>
                         </Routes>   
                     </div>
                 </div>
