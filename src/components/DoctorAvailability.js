@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import "../CssFiles/Availability.css";
+import "../CssFiles/Availability.css"
 
-const DoctorAvailability = ({doctorId,token}) => {
+const DoctorAvailability = ({token,doctorId}) => {
   const now = useMemo(() => Date.now(), []);
 
   const getStartOfWeek = useCallback((date) => {
@@ -55,9 +55,12 @@ const DoctorAvailability = ({doctorId,token}) => {
 
   const generateDatesForWeek = useCallback((startDate) => {
     const dates = [];
+    const start = new Date(startDate); // Create a new Date object from startDate
+    start.setHours(0, 0, 0, 0); // Ensure the start of the week has no time component
+  
     for (let i = 0; i < 5; i++) {
-      const newDate = new Date(startDate);
-      newDate.setDate(startDate.getDate() + i);
+      const newDate = new Date(start); // Create a *new* Date object based on the *initial* 'start'
+      newDate.setDate(start.getDate() + i); // Increment the *newDate*
       dates.push({
         day: days[i],
         date: formatDate(newDate),
@@ -115,6 +118,9 @@ const DoctorAvailability = ({doctorId,token}) => {
             calculatedStatus = "Unavailable";
             console.log("  Marking as Unavailable (Past Time - Initial Fetch)");
           }
+          else if (slotStartTime.getTime() < now){
+            calculatedStatus = "Available";
+          }
         } else if (slotDate < currentToday) {
           calculatedStatus = "Unavailable";
           console.log("  Marking as Unavailable (Past Day)");
@@ -148,7 +154,7 @@ const DoctorAvailability = ({doctorId,token}) => {
             method: "GET",
             headers: {
               "Content-type": "Application/json",
-              'Authorization': `Bearer ${token}`
+               'Authorization': `Bearer ${token}`
             },
           }
         );
@@ -197,32 +203,36 @@ const DoctorAvailability = ({doctorId,token}) => {
 
   const openModal = useCallback((timeIndex, dayIndex, isPast, fullDate, timeslot) => {
     const slotData = availability[timeIndex][dayIndex];
-    const [startTime] = timeslot.split(" - ")[0].split(":");
-
-    let adjustedHours = parseInt(startTime[0], 10);
+    const timePart = timeslot.split(" - ")[0];
+    const parts = timePart.split(":");
+    let adjustedHours = parseInt(parts[0], 10);
     let startTimeMinutes = 0;
-    let ampm = "";
+    let ampmMatch = timePart.match(/([AP]M)$/i);
+    let ampm = ampmMatch ? ampmMatch[1].toUpperCase() : "";
 
-    if (startTime.length > 1) {
-      startTimeMinutes = parseInt(startTime[1].substring(0, 2), 10);
-      ampm = startTime[1].substring(2).trim().toUpperCase();
-
-      if (ampm === "PM" && adjustedHours !== 12) {
-        adjustedHours += 12;
-      } else if (ampm === "AM" && adjustedHours === 12) {
-        adjustedHours = 0;
-      }
+    if (parts.length > 1) {
+      startTimeMinutes = parseInt(parts[1].substring(0, 2), 10);
     }
-
+    if (ampm === "PM" && adjustedHours !== 12) {
+      adjustedHours += 12;
+    } else if (ampm === "AM" && adjustedHours === 12) {
+        adjustedHours = 0;
+    }
     const slotStartTime = new Date(fullDate);
     slotStartTime.setHours(adjustedHours, startTimeMinutes, 0, 0);
     const isCurrentDay = fullDate.toDateString() === todayString;
     const isPastTimeSlot = isCurrentDay && slotStartTime.getTime() < Date.now();
-    const isPastDay = fullDate < new Date();
+    const today = new Date();
+    const calendarDate = fullDate;
+    const isPastDay = (
+    calendarDate.getFullYear() < today.getFullYear() ||
+      (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() < today.getMonth()) ||
+      (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() === today.getMonth() && calendarDate.getDate() < today.getDate())
+    );
 
     console.log("Clicked Slot:", { timeIndex, dayIndex, isPast, fullDate, timeslot, slotData });
     console.log("  Is Current Day Past Time Slot:", isPastTimeSlot);
-
+    console.log("Check",fullDate,slotStartTime.getTime(),!isPastTimeSlot,slotStartTime);
     if (!isPastDay && slotData.status !== "Booked" && !isPastTimeSlot) {
       setSelectedSlot({ timeIndex, dayIndex, fullDate, timeslot });
       setModalOpen(true);
@@ -241,13 +251,7 @@ const DoctorAvailability = ({doctorId,token}) => {
         ? `http://localhost:8000/availability/block/${availabilityId}`
         : `http://localhost:8000/availability/release/${availabilityId}`;
     try {
-      const response = await fetch(endpoint, { 
-        method: "PUT",
-        headers: {
-            "Content-type": "Application/json",
-            'Authorization': `Bearer ${token}`
-          }
-     });
+      const response = await fetch(endpoint, { method: "PUT" });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -282,30 +286,39 @@ const DoctorAvailability = ({doctorId,token}) => {
               <td className="timeslot-label">{timeslot}</td>
               {weekDates.map((dateEntry, dayIndex) => {
                 const slotData = availability[timeIndex][dayIndex];
-                const [startTime] = timeslot.split(" - ")[0].split(":");
-                let adjustedHours = parseInt(startTime[0], 10);
+                const timePart = timeslot.split(" - ")[0];
+                const parts = timePart.split(":");
+                let adjustedHours = parseInt(parts[0], 10);
                 let startTimeMinutes = 0;
-                let ampm = "";
+                let ampmMatch = timePart.match(/([AP]M)$/i);
+                let ampm = ampmMatch ? ampmMatch[1].toUpperCase() : "";
 
-                if (startTime.length > 1) {
-                  startTimeMinutes = parseInt(startTime[1].substring(0, 2), 10);
-                  ampm = startTime[1].substring(2).trim().toUpperCase();
-
-                  if (ampm === "PM" && adjustedHours !== 12) {
-                    adjustedHours += 12;
-                  } else if (ampm === "AM" && adjustedHours === 12) {
-                    adjustedHours = 0;
-                  }
+                if (parts.length > 1) {
+                  startTimeMinutes = parseInt(parts[1].substring(0, 2), 10);
                 }
+
+                if (ampm === "PM" && adjustedHours !== 12) {
+                  adjustedHours += 12;
+                } else if (ampm === "AM" && adjustedHours === 12) {
+                  adjustedHours = 0;
+                }
+
                 const slotStartTime = new Date(dateEntry.fullDate);
                 slotStartTime.setHours(adjustedHours, startTimeMinutes, 0, 0);
                 const isCurrentDay = dateEntry.fullDate.toDateString() === todayString;
                 const isPastTimeSlot = isCurrentDay && slotStartTime.getTime() < Date.now();
-                const isPastDay = dateEntry.fullDate < new Date();
+                
+                const today = new Date();
+                const calendarDate = dateEntry.fullDate;
+                const isPastDay = (
+                  calendarDate.getFullYear() < today.getFullYear() ||
+                  (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() < today.getMonth()) ||
+                  (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() === today.getMonth() && calendarDate.getDate() < today.getDate())
+                );
+                
                 const shouldDisable = slotData.status === "Booked" || slotData.status === "Blocked" || (isCurrentDay && isPastTimeSlot) || isPastDay;
                 const slotClassName = `slot ${slotData.status.toLowerCase()} ${shouldDisable ? 'disabled' : ''}`;
                 const isClickable = !shouldDisable;
-
                 return (
                   <td
                     key={dayIndex}

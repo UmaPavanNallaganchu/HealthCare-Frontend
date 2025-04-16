@@ -90,7 +90,7 @@ const SignUp = ({back}) => {
         <div className='signuppage'>
             <form onSubmit={HandleSignUp} id='loginForm'>
                 <div className='logindetails'>
-                    <p>Login Details</p>
+                    <p> </p>
                     <input type='text' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Enter your email ID' />
                     {errors.email && <div className='error'>{errors.email}</div>}
                     <input type='text' value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder='Enter your phone number' />
@@ -103,7 +103,7 @@ const SignUp = ({back}) => {
                 </div>
                 <div className='linedivide'></div>
                 <div className='personaldetails'>
-                    <p>Profile Details</p>
+                    <p> </p>
                     <select id='role' value={role} onChange={null}>
                         <option value="PATIENT">Patient</option>
                     </select>

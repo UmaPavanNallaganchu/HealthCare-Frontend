@@ -23,7 +23,8 @@ function DoctorDashBoard() {
             <div className='doctorDashBoard'>
                 <div className='navbarforPatient'><DoctorNavbar userdata={userdata} token={token}/></div>
                 <div className='dashBoardContent'>
-                    <div className='topTab'>
+                    <div className='topTabDoctor'>
+                        <h2>DOCTOR DASHBOARD</h2>
                         <FontAwesomeIcon className="bell" icon={faBell} onClick={handleBellClick} />
                         {notificationTab && <Notifications tab={setNotificationTab} userType={userdata.role} token={token} userId={userdata.userId}/>}
                     </div>

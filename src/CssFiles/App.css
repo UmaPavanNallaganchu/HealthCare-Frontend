@@ -11,3 +11,9 @@
   margin: 0;
   background-image: url("C:\Users\2389365\OneDrive - Cognizant\Desktop\frontend_project\healthcaremanagement_frontend\src\assets\backgroundHospital.jpg");
 }
+.copyright{
+  position: fixed;
+  bottom: 2px;
+  right: 20px;
+  color: darkgray;
+}

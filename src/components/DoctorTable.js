@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import '../CssFiles/DoctorTable.css';
-
-const DoctorTable = ({ appointments, setAppointments, handleBookUpdate, updatingAppointment, token }) => {
+import "../CssFiles/DoctorTable.css";
+const DoctorTable = ({token,patientId,patientName}) => {
   const [displayDoctors, setDisplayDoctors] = useState([]);
   const [fetchError, setFetchError] = useState(null);
   const [specialization, setSpecialization] = useState('');
@@ -11,7 +10,6 @@ const DoctorTable = ({ appointments, setAppointments, handleBookUpdate, updating
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log('DoctorTable: Fetching doctor data...');
       try {
         const response = await fetch('http://localhost:8000/availability/doctors', {
           method: 'GET',
@@ -22,23 +20,18 @@ const DoctorTable = ({ appointments, setAppointments, handleBookUpdate, updating
         });
 
         if (!response.ok) {
-          console.error('DoctorTable: Network response was not ok', response);
           throw new Error('Network response was not ok');
         }
 
         const data = await response.json();
-        console.log('DoctorTable: API response data', data);
 
         if (data.success && data.data) {
           setDisplayDoctors(data.data);
           setFetchError(null);
-          console.log('DoctorTable: All doctors set', data.data);
         } else {
-          console.error('DoctorTable: Failed to fetch doctors:', data.message);
           setFetchError('Failed to fetch doctor data. Please try again later.');
         }
       } catch (error) {
-        console.error('DoctorTable: Error fetching doctors:', error);
         setFetchError('Failed to connect to the server. Please check your network connection.');
       }
     };
@@ -54,35 +47,31 @@ const DoctorTable = ({ appointments, setAppointments, handleBookUpdate, updating
   );
 
   const handleBook = async (doctor) => {
-    console.log('DoctorTable: Booking doctor', doctor);
-
     try {
+        const patientdetails ={
+            patientId:patientId,
+            patientName:patientName,
+            doctorName:doctor.doctorName
+        }
       const response = await fetch(`http://localhost:8065/appointments/create/${doctor.availabilityId}`, {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        body:JSON.stringify(patientdetails)
       });
 
       if (!response.ok) {
-        console.error('DoctorTable: Failed to create appointment:', response);
         throw new Error('Failed to create appointment');
       }
 
       const data = await response.json();
-      console.log('DoctorTable: Appointment created:', data);
-
-      setAppointments(prev => {
-        const newAppointments = [...prev, { id: Date.now(), doctor: doctor.doctorName, date: doctor.date, timeSlot: doctor.timeSlots, status: 'Booked', prescription: 'Sample prescription' }];
-        return newAppointments;
-      });
 
       setDisplayDoctors(prevDoctors => prevDoctors.filter(d => d.doctorId !== doctor.doctorId));
 
       alert('Appointment booked successfully!');
     } catch (error) {
-      console.error('DoctorTable: Error creating appointment:', error);
       alert('Failed to book appointment. Please try again.');
     }
   };
@@ -132,11 +121,7 @@ const DoctorTable = ({ appointments, setAppointments, handleBookUpdate, updating
                 <td>{doctor.date}</td>
                 <td>{doctor.timeSlots}</td>
                 <td>
-                  {updatingAppointment ? (
-                    <button className="update-button" onClick={() => handleBookUpdate(doctor)}>Update</button>
-                  ) : (
-                    <button onClick={() => handleBook(doctor)}>Book</button>
-                  )}
+                  <button onClick={() => handleBook(doctor)}>Book</button>
                 </td>
               </tr>
             ))}

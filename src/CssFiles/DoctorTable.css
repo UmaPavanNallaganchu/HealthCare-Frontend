@@ -5,15 +5,18 @@
   width: 100%;
 }
 .doctortable{
-  align-items: center;
-  justify-content: space-evenly;
-  text-align: center;
-  width: 100%;
+  display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: space-evenly;
+    text-align: center;
 }
 
 .doctortable table tbody {
   display: block;
-  max-height: 350px; /* Adjust the height as needed */
+  max-height: 300px; /* Adjust the height as needed */
   overflow-y: auto;
 }
 
@@ -24,7 +27,7 @@
 }
 
 .doctortable table {
-  width: 100%;
+  width: 90%;
   border-collapse: collapse;
 }
 

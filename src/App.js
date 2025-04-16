@@ -20,6 +20,7 @@ function App() {
 
   return (
     <div className="App">
+      <p className='copyright'>&copy; 2025 HealthCare Management </p>
       {loggedIn ? (
         loginDetails && loginDetails.role === 'PATIENT' ? (
           <PatientDashBoard />

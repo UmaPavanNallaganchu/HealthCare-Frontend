@@ -3,6 +3,7 @@ import "../CssFiles/PatientNavbar.css";
 import {Link} from'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser ,faUserEdit, faSignOutAlt, faCalendarAlt, faNotesMedical ,faClipboardList} from '@fortawesome/free-solid-svg-icons';
+import patientimage from '../assets/patient.png';
 function PatientNavBar({userdata,token}){
     const [popup, setPopup] = useState(false);
     const [userData, setUserData] = useState(null);
@@ -39,16 +40,21 @@ function PatientNavBar({userdata,token}){
         }
       };
 
+      const editProfile = () =>{
+        window.location.href = '/edit-profile';
+      }
+
     return (
         <div className="navbarcss">
             <div className="profile">  
-            <FontAwesomeIcon  className="profileIcon" icon={faUser} onClick={handleProfile}/>
+            <img src={patientimage} alt="DoctorProfile" className="profileIcon" onClick={handleProfile} />
             <p>{userdata.name}</p> 
             </div>
             <nav>
                 <ul>
                 <li><Link to="/edit-profile"><FontAwesomeIcon icon={faUserEdit} /> &nbsp; Edit Profile</Link></li>
                 <li><Link to="/manage-bookings"><FontAwesomeIcon icon={faCalendarAlt} />  &nbsp; Manage Bookings</Link></li>
+                <li><Link to="/myAppointments"><FontAwesomeIcon icon={faCalendarAlt} />  &nbsp; My Appointments</Link></li>
                 <li><Link to="/myConsultations"><FontAwesomeIcon icon={faClipboardList} /> &nbsp; My Consultations</Link></li>
                 <li><Link to="/medicalHistory"><FontAwesomeIcon icon={faNotesMedical} />  &nbsp; Medical History</Link></li>
                 <li><a href="/" onClick={handleLogout}><FontAwesomeIcon icon={faSignOutAlt} /> &nbsp; Logout</a></li>
@@ -68,6 +74,7 @@ function PatientNavBar({userdata,token}){
             <p><strong>Age:</strong>&nbsp;&nbsp;{userData.data.age}</p>
             <p><strong>Address:</strong>&nbsp;&nbsp;{userData.data.address}</p>
             {/* Add more user details as needed */}
+            <button onClick={editProfile}>Edit Profile</button>
           </div>
         </div>
       )}

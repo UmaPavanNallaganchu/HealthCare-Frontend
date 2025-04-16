@@ -3,7 +3,7 @@ import "../CssFiles/DoctorNavbar.css";
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faUserEdit, faSignOutAlt, faCalendarCheck, faHistory } from '@fortawesome/free-solid-svg-icons';
-
+import doctorimage from "../assets/doctor.png";
 function DoctorNavbar({userdata,token}) {
   const [popup, setPopup] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -15,6 +15,10 @@ function DoctorNavbar({userdata,token}) {
   const closePopup = () => {
     setPopup(false);
   };
+
+  const editProfile = () =>{
+    window.location.href = '/edit-profile';
+  }
 
   const handleProfile = async (event) => {
     event.preventDefault();
@@ -45,7 +49,7 @@ function DoctorNavbar({userdata,token}) {
   return (
     <div className="navbarcss">
       <div className="profile">
-        <FontAwesomeIcon className="profileIcon" icon={faUser} onClick={handleProfile} />
+        <img src={doctorimage} alt="DoctorProfile" className="profileIcon" onClick={handleProfile} />
         <p>{userdata.name}</p>
       </div>
       <nav>
@@ -67,7 +71,7 @@ function DoctorNavbar({userdata,token}) {
             <p><strong>PhoneNumber:</strong> &nbsp; &nbsp;{userData.data.phoneNumber}</p>
             <p><strong>Name:</strong> &nbsp; &nbsp;{userData.data.name}</p>
             <p><strong>Specialization:</strong> &nbsp; &nbsp;{userData.data.specialization}</p>
-            {/* Add more user details as needed */}
+            <button onClick={editProfile}>Edit Profile</button>
           </div>
         </div>
       )}
