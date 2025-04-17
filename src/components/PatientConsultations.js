@@ -82,9 +82,9 @@ const PatientConsultations = ({ token, patientId }) => {
         <div className='patientConsultation'>
             <h3>Consultation Details</h3>
             {consultations.length > 0 ? (
-                <div className='Consultation'>
+                <div className='patientConsultation' >
                     {consultations.map((consultation) => (
-                        <div key={consultation.consultationId}>
+                        <div className='Consultation' key={consultation.consultationId}>
                             <p><strong>Doctor Name:</strong> {consultation.doctorName}</p>
                             <p><strong>Date Of Consultation:</strong> {consultation.date}</p>
                             <p><strong>Notes:</strong> {consultation.notes}</p>
