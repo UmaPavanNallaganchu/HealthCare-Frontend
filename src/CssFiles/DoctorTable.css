@@ -43,3 +43,25 @@
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
+.confirmingAppointment{
+  display: flex;
+    flex-direction: column;
+    justify-content: left;
+    background-color: white; /* Solid white background for the modal content */
+    padding: 20px;
+    align-items: center;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: auto;
+}
+.confirmingAppointment .doctorDetails{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: rgb(255, 255, 255);
+  text-align: left;
+}
+.confirmingAppointment button{
+  margin-top: 10px;
+  width: 100%;
+}

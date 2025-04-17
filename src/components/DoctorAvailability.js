@@ -78,15 +78,10 @@ const DoctorAvailability = ({token,doctorId}) => {
         .map(() => Array(5).fill({ status: "Unavailable", availabilityId: null }));
  
       const currentToday = new Date();
-      console.log("Current 'today' in updateAvailability:", currentToday.toDateString());
  
       data.forEach((slot) => {
-        console.log("slot:", slot); // LOG 1: Check the entire slot object
-        console.log("slot.timeSlots:", slot.timeSlots); // LOG 2: Check the raw timeSlots value from backend
         const timeSlotString = timeslotMapping[slot.timeSlots];
-        console.log("timeSlotString:", timeSlotString); // LOG 3: Check the mapped timeSlotString
         const slotDate = new Date(slot.date);
-        console.log("Parsed slotDate:", slotDate.toDateString());
         const dayIndex = slotDate.getDay() - 1;
         const timeslotsArray = timeSlotString ? timeSlotString.split(" - ")[0].split(":") : []; // Safe split
         console.log("timeslotsArray:", timeslotsArray); // LOG 4: Check the array after splitting the start time
@@ -112,19 +107,18 @@ const DoctorAvailability = ({token,doctorId}) => {
  
         const slotStartTime = new Date(slotDate);
         slotStartTime.setHours(startTimeHours, startTimeMinutes, 0, 0);
-        console.log(`  Current Day Slot: Start Time=${slotStartTime}, Now=${new Date(now)}, Is Past=${slotStartTime.getTime() < now}`);
         let calculatedStatus = slot.status;
         if (slotDate.toDateString() === currentToday.toDateString()) {
           if (slotStartTime.getTime() < now) {
             calculatedStatus = "Unavailable";
-            console.log("  Marking as Unavailable (Past Time - Initial Fetch)");
+            
           }
           else if (slotStartTime.getTime() < now){
             calculatedStatus = "Available";
           }
         } else if (slotDate < currentToday) {
           calculatedStatus = "Unavailable";
-          console.log("  Marking as Unavailable (Past Day)");
+          
         }
  
         const timeIndex = timeslots.indexOf(timeSlotString);
@@ -231,9 +225,6 @@ const DoctorAvailability = ({token,doctorId}) => {
       (calendarDate.getFullYear() === today.getFullYear() && calendarDate.getMonth() === today.getMonth() && calendarDate.getDate() < today.getDate())
     );
  
-    console.log("Clicked Slot:", { timeIndex, dayIndex, isPast, fullDate, timeslot, slotData });
-    console.log("  Is Current Day Past Time Slot:", isPastTimeSlot);
-    console.log("Check",fullDate,slotStartTime.getTime(),!isPastTimeSlot,slotStartTime);
     if (!isPastDay && slotData.status !== "Booked" && !isPastTimeSlot) {
       setSelectedSlot({ timeIndex, dayIndex, fullDate, timeslot });
       setModalOpen(true);

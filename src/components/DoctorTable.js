@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import "../CssFiles/DoctorTable.css";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faTimesCircle} from '@fortawesome/free-solid-svg-icons';
 const DoctorTable = ({token,patientId,patientName}) => {
   const [displayDoctors, setDisplayDoctors] = useState([]);
   const [fetchError, setFetchError] = useState(null);
@@ -7,7 +10,8 @@ const DoctorTable = ({token,patientId,patientName}) => {
   const [date, setDate] = useState('');
   const [search, setSearch] = useState('');
   const [timeSlot, setTimeSlot] = useState('');
-
+  const [confirmationPopup,setConfirmationPopup] = useState(false);
+  const [doctordata,setDoctorData]=useState();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,16 +59,18 @@ const DoctorTable = ({token,patientId,patientName}) => {
                 default: return parseInt(time);
             }
         });
-
         // Check if the appointment date is in the future or if it's today and the time slot is in the future
         return appointmentDate > currentDate || 
-               (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < endHour);
+               (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < startHour);
     });
     setDisplayDoctors(filteredData);
 };
 
 
-
+  const handlePopup = (doctor) =>{
+    setDoctorData(doctor);
+    setConfirmationPopup(true);
+  }
 
   const filteredDoctors = displayDoctors.filter(doctor =>
     (specialization ? doctor.specialization === specialization : true) &&
@@ -98,8 +104,10 @@ const DoctorTable = ({token,patientId,patientName}) => {
       setDisplayDoctors(prevDoctors => prevDoctors.filter(d => d.doctorId !== doctor.doctorId));
 
       alert('Appointment booked successfully!');
+      setConfirmationPopup(false);
     } catch (error) {
       alert('Failed to book appointment. Please try again.');
+      setConfirmationPopup(false);
     }
   };
 
@@ -157,13 +165,25 @@ const DoctorTable = ({token,patientId,patientName}) => {
                 <td>{doctor.date}</td>
                 <td>{doctor.timeSlots}</td>
                 <td>
-                  <button onClick={() => handleBook(doctor)}>Book</button>
+                  <button onClick={() => handlePopup(doctor)}>Book</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
+      {confirmationPopup && 
+      <div className='modal-overlay'>
+        <div className='confirmingAppointment'>
+        <FontAwesomeIcon icon={faTimesCircle} style={{color:"red",fontSize:"24px",marginLeft:"200px"}} onClick={()=>{setConfirmationPopup(false)}}/>
+       <div className='doctorDetails'> <label><b>Doctor_Name :</b> &nbsp; &nbsp;{doctordata.doctorName}</label>
+        <label><b>Doctor_Specialization :</b>&nbsp; &nbsp; {doctordata.specialization}</label>
+        <label><b>Date of Appointment :</b>&nbsp; &nbsp; {doctordata.date}</label>
+        <label><b>Time Slot :</b> &nbsp; &nbsp;{doctordata.timeSlots}</label>
+        </div>
+        <button onClick={() => handleBook(doctordata)}>confirm Booking</button>
+        </div>
+      </div>}
     </div>
   );
 };

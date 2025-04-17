@@ -11,6 +11,8 @@ const ViewAppointments = ({ patientId, token }) => {
     const [doctorforRescheduling,setDoctorforRescheduling] = useState([]);
     const [IsReschedule,setIsReschedule] = useState(false);
     const [IdforReschedule,setIdforReschedule]=useState();
+    const [confirmationPopup,setConfirmationPopup] = useState(false);
+    const [cancelId,setCancelId]=useState();
     useEffect(() => {
         const retrieveData = async () => {
             const apiUrl = `http://localhost:8065/appointments/viewByPatient/${patientId}`;
@@ -34,8 +36,7 @@ const ViewAppointments = ({ patientId, token }) => {
     }, [patientId, token]);
 
     const handleCancel = async (id) => {
-        const confirmCancel = window.confirm("Are you sure you want to cancel this appointment?");
-        if (confirmCancel) {
+       
             const apiUrl = `http://localhost:8065/appointments/cancel/${id}`;
             const response = await fetch(apiUrl, {
                 method: 'DELETE',
@@ -48,12 +49,12 @@ const ViewAppointments = ({ patientId, token }) => {
             if (response.ok) {
                 console.log("Cancelled Successfully", response);
                 alert("Appointment Cancelled");
+                setConfirmationPopup(false);
                 // Optionally, refresh the appointments list
                 setAppointments(appointments.filter(appointment => appointment.appointmentId !== id));
             } else {
                 console.log("Unable to Cancel");
             }
-        }
     };
     
     const handleRedirect = () => {
@@ -90,9 +91,11 @@ const ViewAppointments = ({ patientId, token }) => {
        });
        if(response.ok){
             alert("appointment Rescheduled Successfully");
+            setIsReschedule(false);
        }
        else{
-            console.log("unable to Reschedule appointment");
+            alert("unable to Reschedule appointment , Try Again later");
+            setIsReschedule(false);
        }
     }
 
@@ -112,15 +115,19 @@ const ViewAppointments = ({ patientId, token }) => {
                     default: return parseInt(time);
                 }
             });
-    
+            
+            console.log("current hours :",currentDate.getHours());
             // Check if the appointment date is in the future or if it's today and the time slot is in the future
             return appointmentDate > currentDate || 
-                   (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < endHour);
+                   (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() > endHour && currentDate.getHours() > startHour);
         });
             setDoctorforRescheduling(filteredData);
     };
 
-    
+    const handleCancelPopup = (Id)=>{
+        setConfirmationPopup(true);
+        setCancelId(Id);
+    }
     return (
         <div className="appointmentdetails">
             {appointments.length === 0 ? (
@@ -135,7 +142,7 @@ const ViewAppointments = ({ patientId, token }) => {
                         <p><strong>Date:</strong> {appointment.date}</p>
                         <p><strong>Time Slot:</strong> {appointment.timeSlot}</p>
                         <p><strong>Status:</strong> {appointment.status}</p>
-                        {appointment.status === "Booked" && <button onClick={() => handleCancel(appointment.appointmentId)}>Cancel Appointment</button>}
+                        {appointment.status === "Booked" && <button onClick={() => handleCancelPopup(appointment.appointmentId)}>Cancel Appointment</button>}
                         {appointment.status === "Completed" && <button onClick={() => handleRedirect()}>View Consultation</button>}
                         {appointment.status === "Booked" && <button style={{backgroundColor:"orange",marginLeft:"10px"}} onClick={() => handleUpdate(appointment.appointmentId,appointment.doctorId)}>Reschedule Appointment</button>}
 
@@ -176,6 +183,14 @@ const ViewAppointments = ({ patientId, token }) => {
         </div>
         </div>
         }
+         {confirmationPopup && 
+              <div className='modal-overlay'>
+                <div className='confirmingAppointment'>
+                <FontAwesomeIcon icon={faTimesCircle} style={{color:"red",fontSize:"24px",marginLeft:"200px"}} onClick={()=>{setConfirmationPopup(false)}}/>
+                    <p>Are You Sure About Cancelling Appointment?</p>
+                <button onClick={() => handleCancel(cancelId)}>Cancel Appointment</button>
+                </div>
+              </div>}
         </div>
     );
 };
