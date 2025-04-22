@@ -46,25 +46,34 @@ const DoctorTable = ({token,patientId,patientName}) => {
 
   const filterFutureAppointments = (data) => {
     const currentDate = new Date();
-    const filteredData = data.filter(appointment => {
-        const appointmentDate = new Date(appointment.date);
+    const filteredData = [];
+
+    for (let i = 0; i < data.length; i++) {
+        const appointment = data[i];
         const [startHour, endHour] = appointment.timeSlots.split('_TO_').map(time => {
             switch (time) {
-                case 'FOUR': return 4;
-                case 'SIX': return 6;
-                case 'TWO': return 2;
-                case 'NINE': return 9;
-                case 'ELEVEN': return 11;
-                case 'ONE': return 1;
+                case 'FOUR': return 16; // 4 PM
+                case 'SIX': return 18; // 6 PM
+                case 'TWO': return 14; // 2 PM
+                case 'NINE': return 9; // 9 AM
+                case 'ELEVEN': return 11; // 11 AM
+                case 'ONE': return 13; // 1 PM
                 default: return parseInt(time);
             }
         });
-        // Check if the appointment date is in the future or if it's today and the time slot is in the future
-        return appointmentDate > currentDate || 
-               (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < startHour);
-    });
+
+        const appointmentDate = new Date(appointment.date);
+
+        if (appointmentDate > currentDate || 
+            (appointmentDate.toDateString() === currentDate.toDateString() && currentDate.getHours() < endHour)) {
+            filteredData.push(appointment);
+        }
+    }
+
     setDisplayDoctors(filteredData);
 };
+
+
 
 
   const handlePopup = (doctor) =>{
